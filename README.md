@@ -1,6 +1,6 @@
 # PyNNS
 
-Python port of the R NNS 12.1 beta package.
+Python port of the R NNS 13.0 package.
 
 - PyPI package: `nns-pm`
 - Import name: `pynns`
