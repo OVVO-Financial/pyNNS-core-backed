@@ -16,7 +16,7 @@ def lpm(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if native is not None and targets.size > 0 and _native_safe(values, targets):
         native_result = native.lpm(
             degree,
             float(targets[0]) if np.asarray(target).ndim == 0 else targets,
@@ -42,7 +42,12 @@ def lpm_ratio(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if (
+        native is not None
+        and hasattr(native, "lpm_ratio_v")
+        and targets.size > 0
+        and _native_safe(values, targets)
+    ):
         native_result = native.lpm_ratio_v(
             degree,
             np.ascontiguousarray(targets),
@@ -70,7 +75,7 @@ def upm(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if native is not None and targets.size > 0 and _native_safe(values, targets):
         native_result = native.upm(
             degree,
             float(targets[0]) if np.asarray(target).ndim == 0 else targets,
@@ -96,7 +101,12 @@ def upm_ratio(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if (
+        native is not None
+        and hasattr(native, "upm_ratio_v")
+        and targets.size > 0
+        and _native_safe(values, targets)
+    ):
         native_result = native.upm_ratio_v(
             degree,
             np.ascontiguousarray(targets),
@@ -112,6 +122,13 @@ def upm_ratio(
     with np.errstate(invalid="ignore", divide="ignore"):
         ratio = np.asarray(upper) / (np.asarray(lower) + np.asarray(upper))
     return _result_for_target(np.asarray(ratio).reshape(-1), target)
+
+
+def _native_safe(
+    values: NDArray[np.float64],
+    targets: NDArray[np.float64],
+) -> bool:
+    return bool(np.all(np.isfinite(values)) and np.all(np.isfinite(targets)))
 
 
 def _as_1d_values(x: NDArray[np.float64]) -> NDArray[np.float64]:

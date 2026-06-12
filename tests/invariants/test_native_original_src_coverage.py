@@ -129,6 +129,26 @@ def test_direct_native_internal_helper_smoke(native: ModuleType) -> None:
         assert list(dummy_fr["names"]) == ["a", "b", "c"]
 
 
+class _FinitePartialMomentNative:
+    @staticmethod
+    def lpm(*args: Any, **kwargs: Any) -> float:
+        return 0.0
+
+    @staticmethod
+    def upm(*args: Any, **kwargs: Any) -> float:
+        return 0.0
+
+
+def test_public_lpm_upm_non_finite_values_use_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(core_module, "nnscore", lambda: _FinitePartialMomentNative())
+    x = np.array([1.0, np.nan, 3.0], dtype=np.float64)
+
+    assert np.isnan(lpm(1.0, 0.0, x))
+    assert np.isnan(upm(1.0, 0.0, x))
+
+
 @pytest.mark.parametrize(
     ("native_call", "fallback_call"),
     [
