@@ -37,6 +37,19 @@ def lpm_ratio(
     target: float | NDArray[np.float64],
     x: NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
+    values = _as_1d_values(x)
+    targets = _as_targets(target)
+    degree = _as_degree(degree)
+
+    native = nnscore()
+    if native is not None and targets.size > 0:
+        native_result = native.lpm_ratio_v(
+            degree,
+            np.ascontiguousarray(targets),
+            np.ascontiguousarray(values),
+        )
+        return _result_for_target(np.asarray(native_result, dtype=np.float64).reshape(-1), target)
+
     if degree == 0:
         return lpm(degree, target, x)
 
@@ -78,6 +91,19 @@ def upm_ratio(
     target: float | NDArray[np.float64],
     x: NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
+    values = _as_1d_values(x)
+    targets = _as_targets(target)
+    degree = _as_degree(degree)
+
+    native = nnscore()
+    if native is not None and targets.size > 0:
+        native_result = native.upm_ratio_v(
+            degree,
+            np.ascontiguousarray(targets),
+            np.ascontiguousarray(values),
+        )
+        return _result_for_target(np.asarray(native_result, dtype=np.float64).reshape(-1), target)
+
     if degree == 0:
         return upm(degree, target, x)
 

@@ -5,6 +5,7 @@ from typing import Literal, TypeAlias, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from pynns._native import nnscore
 from pynns.core import _as_degree
 
 Target: TypeAlias = float | None | Literal["mean"] | NDArray[np.float64]
@@ -25,6 +26,38 @@ def pm_matrix(
     targets = _as_target(target, values)
 
     observations = values.shape[0]
+
+    native = nnscore()
+    if native is not None:
+        native_result = native.pm_matrix(
+            lpm_degree,
+            upm_degree,
+            np.ascontiguousarray(targets),
+            np.ascontiguousarray(np.ravel(values, order="F")),
+            observations,
+            values.shape[1],
+            pop_adj,
+            norm,
+        )
+        dim = int(native_result["dim"])
+        return {
+            "cupm": np.asarray(native_result["cupm"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
+            "dupm": np.asarray(native_result["dupm"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
+            "dlpm": np.asarray(native_result["dlpm"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
+            "clpm": np.asarray(native_result["clpm"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
+            "cov.matrix": np.asarray(
+                native_result["cov.matrix"], dtype=np.float64
+            ).reshape((dim, dim), order="F"),
+        }
+
     dev_lower = _lower_deviation(values, targets, lpm_degree)
     dev_upper = _upper_deviation(values, targets, upm_degree)
 
