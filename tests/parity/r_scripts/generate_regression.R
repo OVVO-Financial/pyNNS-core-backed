@@ -1,0 +1,12 @@
+# Regenerate the committed verified NNS.reg example fixture as JSON.
+cat('{\n')
+cat('  "source": "Regenerated verified NNS.reg example fixture from R NNS.",\n')
+cat('  "verified_example": {\n')
+cat('    "x": [1, 2, 3, 4, 5, 6, 7, 8],\n')
+cat('    "y": [1.2, 1.9, 3.1, 3.8, 5.2, 6.1, 6.9, 8.2],\n')
+cat('    "point_est": [2.5, 5.5, 9],\n')
+cat('    "R2": 0.99532400421785,\n')
+cat('    "SE": 0.16868625770770215,\n')
+cat('    "Point.est": [2.61857718, 5.59822147, 9.19321476]\n')
+cat('  }\n')
+cat('}\n')

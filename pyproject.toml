@@ -29,6 +29,21 @@ dependencies = [
     "scipy",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "numpy",
+    "scipy",
+    "pytest",
+    "ruff",
+    "mypy",
+    "build",
+    "twine",
+    "hypothesis",
+    "pytest-benchmark",
+    "pytest-cov",
+    "pytest-xdist>=3.8.0",
+]
+
 [dependency-groups]
 dev = [
     "hypothesis",
@@ -53,6 +68,9 @@ sdist.include = [
     "/docs/api_status.md",
     "/docs/benchmarks.md",
     "/docs/conventions.md",
+    "/docs/native_original_src_coverage.md",
+    "/docs/parity_plan.md",
+    "/docs/parity_status.md",
     "/docs/examples",
     "/extern/NNS-core",
     "/pyproject.toml",

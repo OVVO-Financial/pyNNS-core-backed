@@ -157,3 +157,17 @@ Status values used below:
 | `nns.hpp` | umbrella header includes component modules | none | none | none | internal-helper | no | yes | none | Include-only aggregator; no functions or result types to bind. |
 | `parallel.hpp` | parallel execution helpers | header/internal support | none | none | internal-helper | no | yes | none | Build/runtime support for C++ core parallel loops; no public Python API. |
 | `version.hpp` | `NNS_CORE_VERSION_MAJOR`, `NNS_CORE_VERSION_MINOR`, `NNS_CORE_VERSION_PATCH`, `NNS_CORE_VERSION` | none | none | none | cxx-exists-unbound | no | yes | none | Compile-time version macros; not bound in this PR. |
+
+## Parity-suite update
+
+The current native routing remains limited to the previously audited public partial-moment APIs. This branch does not broaden native routing.
+
+New parity coverage added before any future migration:
+
+- Public native-routed APIs now have parity tests comparing native output to Python fallback output for `lpm`, `upm`, `lpm_ratio`, `upm_ratio`, `co_lpm`, `co_upm`, `d_lpm`, `d_upm`, and `pm_matrix`.
+- Committed fixtures under `tests/parity/fixtures/` cover R-compatible public outputs for partial moments, central tendencies, and the verified `NNS.reg` example.
+- Private native bindings now have direct parity/smoke tests for vector partial moments, co-partial moments, N-dimensional partial moment helpers, `fast_lm`, `fast_lm_mult`, `stochastic_superiority`, and selected `internal_functions.cpp` helpers.
+- `central_tendencies::rescale` remains intentionally unbound. The Python `nns_rescale` path is fixture-tested and must not be routed through native until risk-neutral and edge-case R fixtures are complete.
+- Dependence, distance, partition, seasonality, stochastic dominance, ARMA, and MEBoot native routing remains blocked until public Python-vs-R fixtures prove shape, keys, orientation, index bases, stochastic behavior, and tolerance policy.
+
+The rule for new native routing is documented in `docs/parity_plan.md`: Python fallback tests, Python-vs-R fixtures, native-vs-fallback tests, native-vs-R checks where applicable, shape/key stability, and a passing CI run are all required before any public API can be routed through C++.

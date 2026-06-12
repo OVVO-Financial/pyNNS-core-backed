@@ -22,20 +22,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install build tools
+      - name: Install package with dev dependencies
         run: |
           python -m pip install -U pip
-          python -m pip install build scikit-build-core nanobind pytest ruff mypy numpy scipy
-          python -m pip install hypothesis pytest-benchmark pytest-xdist
-
-      - name: Install package editable
-        run: python -m pip install -e .
+          python -m pip install -e ".[dev]"
 
       - name: Run native import smoke test
         run: python -c "import pynns._nnscore as c; print(c.lpm(2.0, 0.0, [-2.0, -1.0, 0.5, 3.0]))"
 
-      - name: Run focused tests without Rscript
-        run: python -m pytest -q tests/invariants/test_core.py tests/invariants/test_stochastic_superiority.py tests/invariants/test_export_surface.py
+      - name: Run invariant tests without Rscript
+        run: python -m pytest -q tests/invariants
+
+      - name: Run parity tests without Rscript
+        run: python -m pytest -q tests/parity
 
       - name: Run ruff
         run: ruff check .
