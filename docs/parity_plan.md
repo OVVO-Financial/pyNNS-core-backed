@@ -1,53 +1,24 @@
 # Parity Plan
 
-This branch completes the pre-migration parity suite for `pyNNS-core-backed` while keeping the `NNS-python` migration out of scope.
+## Target
 
-## Closed gap workstream (branch `close-all-parity-gaps`)
+Retarget Python parity to R NNS 13.0. R NNS 13.0 is the tensorized architecture target, and R NNS 12.1 cache data is superseded. NNS-core is v13.0.0 and remains the native C++ foundation.
 
-The gaps previously tracked in `docs/parity_results.md` are now closed or
-formally resolved:
+## Plan
 
-1. **`nns_boost` cache-parity failure** — triaged as seed-sensitivity on the
-   CV-split path for an unseeded call. The boosted result is empirically
-   seed-invariant and matches the committed R cache to ~3.5e-15; the parity test
-   now pins a seed and a `test_nns_boost_ivs_test_none_is_seed_invariant`
-   regression guard was added.
-2. **`NNS.copula` discrete mode** — implemented (`continuous=False`) and adopted.
-3. **`NNS.copula` multivariate / three-column** — implemented (matrix input) and
-   adopted for both continuous and discrete.
-4. **`PM.matrix` data-frame naming** — optional NumPy-first `names` echo added
-   with a parity test; numeric behavior unchanged.
-5. **Plot / graphics policy** — formalized in `docs/plot_parity_policy.md`.
-6. **Skips** — the only remaining skips are intentional live-R-only practical
-   examples (not cache-backed parity gaps).
+1. Install R and R dependencies.
+2. Install R NNS 13.0 from the vendored source tarball used for this one-repo retarget.
+3. Confirm `packageVersion("NNS") == "13.0"`.
+4. Validate the R NNS 13.0 smoke values for partial moments, copula, ARMA, regression points, PM matrix naming, and seeded stack behavior.
+5. Regenerate `tests/_r_cache.json` with R NNS 13.0 metadata and values.
+6. Run cache-only parity, capture the full failure inventory, and fix Python behavior to R NNS 13.0 without loosening tolerances.
+7. Keep full parity claims bounded by tests and cache.
+8. Keep plot artifact policy unchanged.
 
-## Scope
+## Current retarget focus
 
-- Preserve public-behavior parity tests against R NNS 12.1 through `tests/parity/`.
-- Keep R calls isolated in the test harness and cache tooling.
-- Allow CI to run parity checks without `Rscript` by using committed cache fixtures with `PYNNS_R_CACHE_ONLY=1`.
-- Preserve native-vs-Python fallback coverage for partial moments and related helpers.
-- Preserve the merged PR #6 fix that blocks non-finite partial-moment inputs from native dispatch.
+The first fixed root cause is the `NNS.reg(..., multivariate.call = TRUE)` regression-point construction used by nonlinear ARMA. Python now preserves R NNS 13.0's duplicate central-point contribution during endpoint consolidation.
 
-## Cache workflow
+## Environment note
 
-- `tests/_r_cache.json` is the committed R-compatible cache used by CI.
-- `PYNNS_R_CACHE_ONLY=1` forces cache-only parity and must be used in CI.
-- To refresh cache entries on a workstation with R and NNS installed, run:
-
-```bash
-python scripts/regenerate_r_cache.py
-```
-
-Pass pytest selectors after `--` to refresh a narrower subset, for example:
-
-```bash
-python scripts/regenerate_r_cache.py -- tests/parity/test_core.py
-```
-
-## Guardrails
-
-- Do not require `Rscript` in CI.
-- Do not reintroduce stale native expectations for partial moments.
-- Do not import `pynns.pm_matrix` through the package-level public function when module access is required; use `importlib.import_module("pynns.pm_matrix")`.
-- Do not route `NaN` or infinite partial-moment inputs through native `lpm`, `upm`, `lpm_ratio`, or `upm_ratio` dispatch.
+In this run, apt package retrieval for R was blocked by HTTP 403 responses from the configured proxy. The cache metadata and Python behavior retarget are committed, but a full R-backed cache regeneration should be repeated where apt/R installation can complete.
