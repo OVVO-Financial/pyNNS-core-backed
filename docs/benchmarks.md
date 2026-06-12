@@ -15,7 +15,7 @@ uv run python scripts/update_benchmarks_doc.py docs/benchmark_reports/benchmark_
 
 ## Results
 
-R baselines use installed R NNS 12.1.
+R baselines use installed R NNS 13.0.
 
 `Python speed vs R` is computed as `R baseline / Python mean`. Values above `1.00x` mean Python is faster; values below `1.00x` mean Python is slower.
 

@@ -16,6 +16,7 @@ from typing import Any
 
 _CACHE_PATH = Path(__file__).resolve().parents[1] / "tests" / "_r_cache.json"
 _NNS_VERSION = "13.0"
+_SCHEMA_VERSION = 1
 
 
 def _validate_cache() -> int:
@@ -45,6 +46,13 @@ def _validate_cache() -> int:
         print(
             "ERROR: R cache validation failed: "
             f"expected nns_version {_NNS_VERSION!r}, got {cache.get('nns_version')!r}.",
+            file=sys.stderr,
+        )
+        return 1
+    if cache.get("schema_version") != _SCHEMA_VERSION:
+        print(
+            "ERROR: R cache validation failed: "
+            f"expected schema_version {_SCHEMA_VERSION!r}, got {cache.get('schema_version')!r}.",
             file=sys.stderr,
         )
         return 1
