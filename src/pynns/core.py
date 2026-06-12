@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
+from pynns._native import nnscore
+
 
 def lpm(
     degree: float,
@@ -12,6 +14,15 @@ def lpm(
     values = _as_1d_values(x)
     targets = _as_targets(target)
     degree = _as_degree(degree)
+
+    native = nnscore()
+    if native is not None and targets.size > 0:
+        native_result = native.lpm(
+            degree,
+            float(targets[0]) if np.asarray(target).ndim == 0 else targets,
+            np.ascontiguousarray(values),
+        )
+        return _result_for_target(np.asarray(native_result, dtype=np.float64).reshape(-1), target)
 
     if degree == 0:
         moments = np.mean(values <= targets[:, np.newaxis], axis=1)
@@ -44,6 +55,15 @@ def upm(
     values = _as_1d_values(x)
     targets = _as_targets(target)
     degree = _as_degree(degree)
+
+    native = nnscore()
+    if native is not None and targets.size > 0:
+        native_result = native.upm(
+            degree,
+            float(targets[0]) if np.asarray(target).ndim == 0 else targets,
+            np.ascontiguousarray(values),
+        )
+        return _result_for_target(np.asarray(native_result, dtype=np.float64).reshape(-1), target)
 
     if degree == 0:
         moments = np.mean(values > targets[:, np.newaxis], axis=1)
