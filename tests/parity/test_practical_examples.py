@@ -640,7 +640,13 @@ def _run_r_json(script: str, payload: dict[str, Any]) -> dict[str, Any]:
             timeout=90,
         )
     except FileNotFoundError:
-        pytest.skip("Rscript is not available.")
+        pytest.skip(
+            "live-R-only practical example: Rscript is not available. These "
+            "vignette-scale examples regenerate from installed R NNS on demand "
+            "rather than from the committed offline cache, so they are "
+            "intentionally skipped in cache-only/CI runs and are not part of "
+            "ordinary cache-backed parity coverage."
+        )
     except subprocess.CalledProcessError as exc:
         stderr = exc.stderr or ""
         if "there is no package called" in stderr:

@@ -2,6 +2,25 @@
 
 This branch completes the pre-migration parity suite for `pyNNS-core-backed` while keeping the `NNS-python` migration out of scope.
 
+## Closed gap workstream (branch `close-all-parity-gaps`)
+
+The gaps previously tracked in `docs/parity_results.md` are now closed or
+formally resolved:
+
+1. **`nns_boost` cache-parity failure** — triaged as seed-sensitivity on the
+   CV-split path for an unseeded call. The boosted result is empirically
+   seed-invariant and matches the committed R cache to ~3.5e-15; the parity test
+   now pins a seed and a `test_nns_boost_ivs_test_none_is_seed_invariant`
+   regression guard was added.
+2. **`NNS.copula` discrete mode** — implemented (`continuous=False`) and adopted.
+3. **`NNS.copula` multivariate / three-column** — implemented (matrix input) and
+   adopted for both continuous and discrete.
+4. **`PM.matrix` data-frame naming** — optional NumPy-first `names` echo added
+   with a parity test; numeric behavior unchanged.
+5. **Plot / graphics policy** — formalized in `docs/plot_parity_policy.md`.
+6. **Skips** — the only remaining skips are intentional live-R-only practical
+   examples (not cache-backed parity gaps).
+
 ## Scope
 
 - Preserve public-behavior parity tests against R NNS 12.1 through `tests/parity/`.

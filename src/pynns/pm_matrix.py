@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal, TypeAlias, cast
+from collections.abc import Sequence
+from typing import Any, Literal, TypeAlias, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,7 +10,7 @@ from pynns._native import nnscore
 from pynns.core import _as_degree
 
 Target: TypeAlias = float | None | Literal["mean"] | NDArray[np.float64]
-PMMatrixResult: TypeAlias = dict[str, NDArray[np.float64]]
+PMMatrixResult: TypeAlias = dict[str, Any]
 
 
 def pm_matrix(
@@ -19,11 +20,25 @@ def pm_matrix(
     variable: NDArray[np.float64],
     pop_adj: bool,
     norm: bool = False,
+    names: Sequence[str] | None = None,
 ) -> PMMatrixResult:
+    """Return the partial-moment covariance decomposition matrices.
+
+    The numeric matrices are always plain row/column-major NumPy arrays
+    (NumPy-first behavior). R's ``PM.matrix`` additionally copies the input
+    data-frame's column names onto the result matrices' row/column dimnames.
+    NumPy arrays do not carry dimension labels, so that naming behavior is an
+    intentional divergence. When the optional ``names`` argument is supplied
+    (matching the column count), the labels R would attach are echoed back under
+    a ``"names"`` key so callers can build a labeled structure if they want one;
+    the numeric arrays are byte-for-byte identical whether or not ``names`` is
+    given.
+    """
     lpm_degree = _as_degree(lpm_degree)
     upm_degree = _as_degree(upm_degree)
     values = _as_matrix(variable)
     targets = _as_target(target, values)
+    resolved_names = _resolve_names(names, values.shape[1])
 
     observations = values.shape[0]
 
@@ -40,7 +55,7 @@ def pm_matrix(
             norm,
         )
         dim = int(native_result["dim"])
-        return {
+        result: PMMatrixResult = {
             "cupm": np.asarray(native_result["cupm"], dtype=np.float64).reshape(
                 (dim, dim), order="F"
             ),
@@ -57,6 +72,9 @@ def pm_matrix(
                 (dim, dim), order="F"
             ),
         }
+        if resolved_names is not None:
+            result["names"] = resolved_names
+        return result
 
     dev_lower = _lower_deviation(values, targets, lpm_degree)
     dev_upper = _upper_deviation(values, targets, upm_degree)
@@ -86,13 +104,25 @@ def pm_matrix(
         clpm[total <= 0.0] = 0.0
 
     cov_matrix = cupm + clpm - dupm - dlpm
-    return {
+    result = {
         "cupm": cupm,
         "dupm": dupm,
         "dlpm": dlpm,
         "clpm": clpm,
         "cov.matrix": cov_matrix,
     }
+    if resolved_names is not None:
+        result["names"] = resolved_names
+    return result
+
+
+def _resolve_names(names: Sequence[str] | None, n_cols: int) -> list[str] | None:
+    if names is None:
+        return None
+    resolved = [str(name) for name in names]
+    if len(resolved) != n_cols:
+        raise ValueError("names length must match the number of variable columns.")
+    return resolved
 
 
 def _lower_deviation(

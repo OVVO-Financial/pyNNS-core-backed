@@ -5,6 +5,10 @@ docs/*
 !docs/api_status.md
 !docs/parity_plan.md
 !docs/parity_status.md
+!docs/parity_results.md
+!docs/original_tests_adoption.md
+!docs/native_original_src_coverage.md
+!docs/plot_parity_policy.md
 !docs/examples/
 !docs/examples/**
 docs/benchmark_reports/

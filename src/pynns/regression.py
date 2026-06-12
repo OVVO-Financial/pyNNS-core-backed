@@ -12,10 +12,9 @@ from pynns._helpers import _fast_lm, _is_fcl
 from pynns.categorical import encode_factor_codes, factor_2_dummy_fr
 from pynns.causation import _uni_caus
 from pynns.central_tendencies import nns_mode
-from pynns.copula import _target
-from pynns.dependence import _dpm_nd, _gravity, nns_dep
+from pynns.copula import _copula
+from pynns.dependence import _gravity, nns_dep
 from pynns.part import NoiseReduction, nns_part
-from pynns.pm_matrix import pm_matrix
 from pynns.smoothing import r_smooth_spline_fixed_spar
 from pynns.var import lpm_var, upm_var
 
@@ -868,28 +867,8 @@ def _rescale_01(values: NDArray[np.float64]) -> NDArray[np.float64]:
 
 
 def _nns_copula_matrix(values: NDArray[np.float64]) -> float:
-    target = _target(values, None, None)
-    discrete_pm = pm_matrix(0.0, 0.0, target, values, pop_adj=False)
-    upper = np.triu_indices(values.shape[1], k=1)
-    discrete_co = float(np.sum(discrete_pm["cupm"][upper]) + np.sum(discrete_pm["clpm"][upper]))
-    if discrete_co == 1.0 or discrete_co == 0.0:
-        return 1.0
-
-    continuous_pm = pm_matrix(1.0, 1.0, target, values, pop_adj=True, norm=True)
-    continuous_co = float(
-        np.sum(continuous_pm["cupm"][upper]) + np.sum(continuous_pm["clpm"][upper])
-    )
-    n_vars = values.shape[1]
-    indep_co = 0.25 * (n_vars * n_vars - n_vars)
-    discrete_dep = min(max(abs(discrete_co - indep_co) / indep_co, 0.0), 1.0)
-    continuous_dep = min(max(abs(continuous_co - indep_co) / indep_co, 0.0), 1.0)
-
-    discrete_d = _dpm_nd(values, target, 0.0, norm=True)
-    continuous_d = _dpm_nd(values, target, 1.0, norm=True)
-    indep_d = 1.0 - (0.5**n_vars)
-    n_dim_discrete = abs(discrete_d - indep_d) / indep_d
-    n_dim_continuous = abs(continuous_d - indep_d) / indep_d
-    return math.sqrt((discrete_dep + continuous_dep + n_dim_discrete + n_dim_continuous) / 4.0)
+    target = cast(NDArray[np.float64], np.mean(values, axis=0))
+    return _copula(values, target, continuous=True)
 
 
 def _dep_reduced_order(dependence: float, order: Order, n: int) -> int | Literal["max"]:
