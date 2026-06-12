@@ -70,7 +70,12 @@ def _co_moment(
     degree_y = _as_degree(degree_y)
 
     native = nnscore()
-    if native is not None and x_targets.size > 0 and y_targets.size > 0:
+    if (
+        native is not None
+        and x_targets.size > 0
+        and y_targets.size > 0
+        and _native_function_available(native, x_side, y_side)
+    ):
         x_contig = np.ascontiguousarray(x_values)
         y_contig = np.ascontiguousarray(y_values)
         x_targets_contig = np.ascontiguousarray(x_targets)
@@ -108,6 +113,16 @@ def _co_moment(
     if np.asarray(target_x).ndim == 0 and np.asarray(target_y).ndim == 0:
         return float(moments[0])
     return moments
+
+
+def _native_function_available(native: object, x_side: object, y_side: object) -> bool:
+    if x_side is _lower and y_side is _lower:
+        return hasattr(native, "co_lpm_v")
+    if x_side is _upper and y_side is _upper:
+        return hasattr(native, "co_upm_v")
+    if x_side is _upper and y_side is _lower:
+        return hasattr(native, "d_lpm_v")
+    return hasattr(native, "d_upm_v")
 
 
 def _as_pair(
