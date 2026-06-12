@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
+from pynns._native import nnscore
+
 
 def _fast_lm(x: NDArray[np.float64], y: NDArray[np.float64]) -> tuple[float, float]:
     """Return intercept and slope matching R's fast_lm helper."""
@@ -14,6 +16,12 @@ def _fast_lm(x: NDArray[np.float64], y: NDArray[np.float64]) -> tuple[float, flo
         raise ValueError("x and y must have the same length.")
     if x_values.size == 0:
         raise ValueError("x and y must be non-empty.")
+
+    native = nnscore()
+    if native is not None:
+        result = native.fast_lm(np.ascontiguousarray(x_values), np.ascontiguousarray(y_values))
+        coef = result["coef"]
+        return float(coef[0]), float(coef[1])
 
     mean_x = float(np.mean(x_values))
     mean_y = float(np.mean(y_values))
