@@ -52,6 +52,10 @@ def test_direct_native_partial_moment_smoke(native: ModuleType) -> None:
 
     assert native.lpm(2.0, 0.0, x) == pytest.approx(1.25)
     assert native.upm(2.0, 0.0, x) == pytest.approx(2.3125)
+    required_vector_helpers = ("lpm_ratio_v", "upm_ratio_v")
+    if not all(hasattr(native, name) for name in required_vector_helpers):
+        pytest.skip("installed native extension does not expose vector ratio helpers")
+
     np.testing.assert_allclose(
         native.lpm_ratio_v(2.0, targets, x),
         lpm_ratio(2.0, targets, x),

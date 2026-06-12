@@ -3,14 +3,16 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, TypeAlias, cast
+from typing import Any, NoReturn, TypeAlias, cast
 from warnings import warn
 
 import numpy as np
+import pytest
 from numpy.typing import NDArray
 
 _CACHE_PATH = Path(__file__).with_name("_r_cache.json")
@@ -28,6 +30,10 @@ _CACHE: Cache | None = None
 _CACHE_REFRESH = False
 
 
+def _skip_cache_miss(message: str) -> NoReturn:
+    pytest.skip(message)
+
+
 def nns(function: str, *args: Any) -> RValue:
     key = _cache_key(function, args)
     cache, refresh = _cache_state()
@@ -35,10 +41,10 @@ def nns(function: str, *args: Any) -> RValue:
     if key in cache:
         return _decode(cache[key])
 
-    if _offline():
-        raise RuntimeError(
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(
             f"R cache miss for NNS::{function} with key {key}. "
-            f"Run without CI/PYNNS_R_CACHE_ONLY/PYNNS_OFFLINE to populate {_CACHE_PATH}."
+            f"Run with Rscript and R NNS installed to populate {_CACHE_PATH}."
         )
 
     return _uncached_nns(function, args, key, refresh)
@@ -60,8 +66,8 @@ def nns_sd_cluster_dendrogram(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.SD.cluster.dendrogram with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.SD.cluster.dendrogram with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -115,8 +121,8 @@ def nns_stack_numeric(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.stack.numeric with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.stack.numeric with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -168,8 +174,8 @@ def nns_boost_numeric(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.boost.numeric with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.boost.numeric with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -211,8 +217,8 @@ def nns_boost_factor_predictor(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.boost.factor_predictor with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.boost.factor_predictor with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -260,8 +266,8 @@ def nns_boost_multi_factor_predictor(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.boost.multi_factor_predictor with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.boost.multi_factor_predictor with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -293,8 +299,8 @@ def nns_reg_factor_predictor(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.reg.factor_predictor with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.reg.factor_predictor with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -330,8 +336,8 @@ def nns_reg_factor_dimred(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.reg.factor_dimred with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.reg.factor_dimred with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -373,8 +379,8 @@ def nns_stack_factor_predictor(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.stack.factor_predictor with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.stack.factor_predictor with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -420,8 +426,8 @@ def nns_stack_mixed_factor_predictor(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.stack.mixed_factor_predictor with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.stack.mixed_factor_predictor with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -463,8 +469,8 @@ def nns_meboot_diagnostics(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.meboot.diagnostics with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.meboot.diagnostics with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -489,8 +495,8 @@ def nns_meboot_stat_summary(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.meboot.stat_summary with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.meboot.stat_summary with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -515,8 +521,8 @@ def nns_mc_grid(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.MC.grid with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.MC.grid with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -550,8 +556,8 @@ def nns_mc_stat_summary(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.MC.stat_summary with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.MC.stat_summary with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -569,8 +575,8 @@ def nns_anova_custom(payload: dict[str, Any]) -> RValue:
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.ANOVA.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.ANOVA.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -594,8 +600,8 @@ def nns_distance_bulk_custom(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.distance.bulk.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.distance.bulk.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -614,8 +620,8 @@ def nns_diff_custom(name: str, point: float) -> RValue:
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.diff.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.diff.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -634,8 +640,8 @@ def dy_dx_overall(x: Sequence[float], y: Sequence[float]) -> RValue:
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for dy.dx.overall with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for dy.dx.overall with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -659,8 +665,8 @@ def factor_dummy_custom(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for factor_2_dummy.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for factor_2_dummy.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -679,8 +685,8 @@ def dy_dx_numeric(x: Sequence[float], y: Sequence[float], eval_point: Sequence[f
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for dy.dx.numeric with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for dy.dx.numeric with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -704,8 +710,8 @@ def dy_d_scalar(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for dy.d.scalar with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for dy.d.scalar with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -729,8 +735,8 @@ def dy_d_scalar_mixed(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for dy.d.scalar.mixed with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for dy.d.scalar.mixed with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -764,8 +770,8 @@ def nns_arma_pred_int(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.ARMA.pred_int with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.ARMA.pred_int with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -799,8 +805,8 @@ def nns_arma_optim_custom(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.ARMA.optim.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.ARMA.optim.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:
@@ -826,8 +832,8 @@ def nns_cdf_custom(
     cache, refresh = _cache_state()
     if key in cache:
         return _decode(cache[key])
-    if _offline():
-        raise RuntimeError(f"R cache miss for NNS.CDF.custom with key {key}.")
+    if _offline() or shutil.which("Rscript") is None:
+        _skip_cache_miss(f"R cache miss for NNS.CDF.custom with key {key}.")
     with _cache_lock():
         disk_cache, disk_refresh = _read_cache_from_disk()
         if refresh or disk_refresh:

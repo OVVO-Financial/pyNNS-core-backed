@@ -3,6 +3,8 @@ docs/*
 !docs/benchmarks.md
 !docs/conventions.md
 !docs/api_status.md
+!docs/parity_plan.md
+!docs/parity_status.md
 !docs/examples/
 !docs/examples/**
 docs/benchmark_reports/

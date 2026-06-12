@@ -42,7 +42,7 @@ def lpm_ratio(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if native is not None and hasattr(native, "lpm_ratio_v") and targets.size > 0:
         native_result = native.lpm_ratio_v(
             degree,
             np.ascontiguousarray(targets),
@@ -96,7 +96,7 @@ def upm_ratio(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0:
+    if native is not None and hasattr(native, "upm_ratio_v") and targets.size > 0:
         native_result = native.upm_ratio_v(
             degree,
             np.ascontiguousarray(targets),

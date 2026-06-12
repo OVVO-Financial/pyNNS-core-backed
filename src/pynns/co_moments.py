@@ -70,27 +70,34 @@ def _co_moment(
     degree_y = _as_degree(degree_y)
 
     native = nnscore()
-    if native is not None and x_targets.size > 0 and y_targets.size > 0:
+    native_name: str | None
+    native_args: tuple[float, float]
+    if x_side is _lower and y_side is _lower:
+        native_name = "co_lpm_v"
+        native_args = (degree_x, degree_y)
+    elif x_side is _upper and y_side is _upper:
+        native_name = "co_upm_v"
+        native_args = (degree_x, degree_y)
+    elif x_side is _upper and y_side is _lower:
+        native_name = "d_lpm_v"
+        native_args = (degree_y, degree_x)
+    else:
+        native_name = "d_upm_v"
+        native_args = (degree_x, degree_y)
+
+    if (
+        native is not None
+        and hasattr(native, native_name)
+        and x_targets.size > 0
+        and y_targets.size > 0
+    ):
         x_contig = np.ascontiguousarray(x_values)
         y_contig = np.ascontiguousarray(y_values)
         x_targets_contig = np.ascontiguousarray(x_targets)
         y_targets_contig = np.ascontiguousarray(y_targets)
-        if x_side is _lower and y_side is _lower:
-            native_result = native.co_lpm_v(
-                degree_x, degree_y, x_contig, y_contig, x_targets_contig, y_targets_contig
-            )
-        elif x_side is _upper and y_side is _upper:
-            native_result = native.co_upm_v(
-                degree_x, degree_y, x_contig, y_contig, x_targets_contig, y_targets_contig
-            )
-        elif x_side is _upper and y_side is _lower:
-            native_result = native.d_lpm_v(
-                degree_y, degree_x, x_contig, y_contig, x_targets_contig, y_targets_contig
-            )
-        else:
-            native_result = native.d_upm_v(
-                degree_x, degree_y, x_contig, y_contig, x_targets_contig, y_targets_contig
-            )
+        native_result = getattr(native, native_name)(
+            *native_args, x_contig, y_contig, x_targets_contig, y_targets_contig
+        )
         moments = np.asarray(native_result, dtype=np.float64).reshape(-1)
         if np.asarray(target_x).ndim == 0 and np.asarray(target_y).ndim == 0:
             return float(moments[0])

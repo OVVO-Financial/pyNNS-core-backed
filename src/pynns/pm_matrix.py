@@ -28,7 +28,7 @@ def pm_matrix(
     observations = values.shape[0]
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "pm_matrix"):
         native_result = native.pm_matrix(
             lpm_degree,
             upm_degree,
