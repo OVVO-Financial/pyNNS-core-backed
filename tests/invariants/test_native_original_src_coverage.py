@@ -72,9 +72,11 @@ def test_direct_native_partial_moment_smoke(native: ModuleType) -> None:
     if hasattr(native, "d_upm"):
         assert np.isfinite(native.d_upm(1.0, 1.0, x, y, 0.0, 1.0))
 
+    matrix = np.array(
+        [[-2.0, 1.0], [-1.0, -0.5], [0.5, 2.0], [3.0, 4.0]], dtype=np.float64
+    )
+    target = np.mean(matrix, axis=0).astype(np.float64)
     if hasattr(native, "pm_matrix"):
-        matrix = np.array([[-2.0, 1.0], [-1.0, -0.5], [0.5, 2.0], [3.0, 4.0]], dtype=np.float64)
-        target = np.mean(matrix, axis=0).astype(np.float64)
         native_pm = native.pm_matrix(
             1.0,
             1.0,
