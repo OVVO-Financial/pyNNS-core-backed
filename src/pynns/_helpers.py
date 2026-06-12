@@ -18,7 +18,7 @@ def _fast_lm(x: NDArray[np.float64], y: NDArray[np.float64]) -> tuple[float, flo
         raise ValueError("x and y must be non-empty.")
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "fast_lm"):
         result = native.fast_lm(np.ascontiguousarray(x_values), np.ascontiguousarray(y_values))
         coef = result["coef"]
         return float(coef[0]), float(coef[1])

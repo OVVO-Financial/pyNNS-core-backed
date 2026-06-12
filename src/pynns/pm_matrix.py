@@ -53,9 +53,9 @@ def pm_matrix(
             "clpm": np.asarray(native_result["clpm"], dtype=np.float64).reshape(
                 (dim, dim), order="F"
             ),
-            "cov.matrix": np.asarray(
-                native_result["cov.matrix"], dtype=np.float64
-            ).reshape((dim, dim), order="F"),
+            "cov.matrix": np.asarray(native_result["cov.matrix"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
         }
 
     dev_lower = _lower_deviation(values, targets, lpm_degree)

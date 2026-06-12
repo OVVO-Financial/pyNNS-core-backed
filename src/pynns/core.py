@@ -16,7 +16,12 @@ def lpm(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0 and _native_safe(values, targets):
+    if (
+        native is not None
+        and hasattr(native, "lpm")
+        and targets.size > 0
+        and _native_safe(values, targets)
+    ):
         native_result = native.lpm(
             degree,
             float(targets[0]) if np.asarray(target).ndim == 0 else targets,
@@ -75,7 +80,12 @@ def upm(
     degree = _as_degree(degree)
 
     native = nnscore()
-    if native is not None and targets.size > 0 and _native_safe(values, targets):
+    if (
+        native is not None
+        and hasattr(native, "upm")
+        and targets.size > 0
+        and _native_safe(values, targets)
+    ):
         native_result = native.upm(
             degree,
             float(targets[0]) if np.asarray(target).ndim == 0 else targets,

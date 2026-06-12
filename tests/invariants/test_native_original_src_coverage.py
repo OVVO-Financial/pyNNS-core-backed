@@ -212,9 +212,7 @@ def test_public_pm_matrix_fallback_matches_native(
     disable_native: None, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     del disable_native
-    matrix = np.array(
-        [[-2.0, 1.0], [-1.0, -0.5], [0.5, 2.0], [3.0, 4.0]], dtype=np.float64
-    )
+    matrix = np.array([[-2.0, 1.0], [-1.0, -0.5], [0.5, 2.0], [3.0, 4.0]], dtype=np.float64)
     fallback = pm_matrix(1.0, 1.0, "mean", matrix, True, norm=False)
 
     native_module = _native()
