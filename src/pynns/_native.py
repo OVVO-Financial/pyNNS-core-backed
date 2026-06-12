@@ -5,7 +5,11 @@ import importlib.util
 from typing import Any, cast
 
 _NNSCORE_SPEC = importlib.util.find_spec("pynns._nnscore")
-_nnscore = importlib.import_module("pynns._nnscore") if _NNSCORE_SPEC is not None else None
+
+try:
+    _nnscore = importlib.import_module("pynns._nnscore") if _NNSCORE_SPEC is not None else None
+except ImportError:
+    _nnscore = None
 
 
 def nnscore() -> Any | None:
