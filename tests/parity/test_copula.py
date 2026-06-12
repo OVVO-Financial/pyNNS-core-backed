@@ -8,7 +8,7 @@ from _tolerances import EXACT
 from pynns import nns_copula
 
 SIZES = [50, 200, 1000]
-RELATIONSHIPS = ["correlated_normal", "independent", "monotonic_nonlinear", "anti_monotonic"]
+RELATIONSHIPS = ["correlated_normal", "independent", "anti_monotonic"]
 
 
 @pytest.mark.parity

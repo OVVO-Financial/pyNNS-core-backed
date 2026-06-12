@@ -28,7 +28,7 @@ def pm_matrix(
     observations = values.shape[0]
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "pm_matrix"):
         native_result = native.pm_matrix(
             lpm_degree,
             upm_degree,
@@ -53,9 +53,9 @@ def pm_matrix(
             "clpm": np.asarray(native_result["clpm"], dtype=np.float64).reshape(
                 (dim, dim), order="F"
             ),
-            "cov.matrix": np.asarray(
-                native_result["cov.matrix"], dtype=np.float64
-            ).reshape((dim, dim), order="F"),
+            "cov.matrix": np.asarray(native_result["cov.matrix"], dtype=np.float64).reshape(
+                (dim, dim), order="F"
+            ),
         }
 
     dev_lower = _lower_deviation(values, targets, lpm_degree)
