@@ -8,7 +8,7 @@ _NNSCORE_SPEC = importlib.util.find_spec("pynns._nnscore")
 
 try:
     _nnscore = importlib.import_module("pynns._nnscore") if _NNSCORE_SPEC is not None else None
-except ImportError:
+except (ImportError, OSError):
     _nnscore = None
 
 
