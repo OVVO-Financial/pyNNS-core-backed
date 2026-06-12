@@ -74,7 +74,7 @@ def _stoch_superiority(
         raise ValueError("x and y must both have positive length.")
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "stochastic_superiority"):
         return dict(
             native.stochastic_superiority(np.ascontiguousarray(xs), np.ascontiguousarray(ys))
         )

@@ -34,8 +34,11 @@ jobs:
       - name: Run native import smoke test
         run: python -c "import pynns._nnscore as c; print(c.lpm(2.0, 0.0, [-2.0, -1.0, 0.5, 3.0]))"
 
-      - name: Run focused tests without Rscript
-        run: python -m pytest -q tests/invariants/test_core.py tests/invariants/test_stochastic_superiority.py tests/invariants/test_export_surface.py
+      - name: Run invariants without Rscript
+        run: python -m pytest -q tests/invariants
+
+      - name: Run parity from committed R cache
+        run: PYNNS_R_CACHE_ONLY=1 python -m pytest -q tests/parity
 
       - name: Run ruff
         run: ruff check .

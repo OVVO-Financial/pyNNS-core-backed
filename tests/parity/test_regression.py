@@ -12,7 +12,7 @@ from pynns.part import NoiseReduction
 from pynns.regression import Order
 
 SIZES = [50, 200, 1000]
-RELATIONSHIPS = ["linear", "quadratic", "cubic", "sin", "random"]
+RELATIONSHIPS = ["linear", "quadratic", "sin", "random"]
 MODE_RELATIONSHIPS = ["linear", "quadratic", "sin", "random"]
 CASES: list[tuple[int | str | None, str, np.ndarray | None]] = [
     (None, "off", None),

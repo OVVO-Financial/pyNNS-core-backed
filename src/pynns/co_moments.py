@@ -70,7 +70,12 @@ def _co_moment(
     degree_y = _as_degree(degree_y)
 
     native = nnscore()
-    if native is not None and x_targets.size > 0 and y_targets.size > 0:
+    if (
+        native is not None
+        and x_targets.size > 0
+        and y_targets.size > 0
+        and all(hasattr(native, name) for name in ("co_lpm_v", "co_upm_v", "d_lpm_v", "d_upm_v"))
+    ):
         x_contig = np.ascontiguousarray(x_values)
         y_contig = np.ascontiguousarray(y_values)
         x_targets_contig = np.ascontiguousarray(x_targets)

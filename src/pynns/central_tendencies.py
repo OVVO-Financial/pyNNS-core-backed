@@ -61,7 +61,7 @@ def nns_mode(
         return np.array([np.nan], dtype=np.float64) if multi else float("nan")
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "mode"):
         native_result = np.asarray(
             native.mode(np.ascontiguousarray(finite), discrete, multi), dtype=np.float64
         )
@@ -88,7 +88,7 @@ def nns_gravity(x: NDArray[np.float64], discrete: bool = False) -> float:
         return float(finite[0])
 
     native = nnscore()
-    if native is not None:
+    if native is not None and hasattr(native, "gravity"):
         return float(native.gravity(np.ascontiguousarray(finite), discrete))
 
     value_range = float(abs(finite[-1] - finite[0]))
