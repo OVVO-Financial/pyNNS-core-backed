@@ -62,3 +62,31 @@ def test_original_pm_matrix_and_survival_cdf_match_r_fixtures() -> None:
     np.testing.assert_allclose(actual["Function"]["x"], exp["cdf_survival"]["x"], atol=TOL)
     np.testing.assert_allclose(actual["Function"]["S(x)"], exp["cdf_survival"]["S(x)"], atol=TOL)
     assert np.asarray(actual["target.value"]).size == 0
+
+
+@pytest.mark.parity
+def test_pm_matrix_optional_names_match_r_dataframe_without_changing_numbers() -> None:
+    # R's test_Partial_Moments.R checks that PM.matrix on a data.frame copies the
+    # frame's column names (here the default V1/V2) onto the cov.matrix dimnames,
+    # while a plain matrix input yields an unnamed matrix with identical numbers.
+    # The Python API is NumPy-first, so labels are exposed via an optional
+    # "names" key rather than as array dimnames. This proves: (a) the numeric
+    # matrices are byte-for-byte identical with or without names (parity is
+    # unaffected by naming), and (b) when names are supplied they match the R
+    # data-frame naming behavior.
+    exp = expected("test_Partial_Moments.R")
+    values = np.array([[1.0, 2.0], [1.0, 2.0], [3.0, 3.0]])
+    target = np.mean(values, axis=0)
+
+    unnamed = pm_matrix(1, 1, target, values, pop_adj=True)
+    named = pm_matrix(1, 1, target, values, pop_adj=True, names=["V1", "V2"])
+
+    assert "names" not in unnamed
+    assert named["names"] == ["V1", "V2"]
+    for key in ("cupm", "dupm", "dlpm", "clpm", "cov.matrix"):
+        np.testing.assert_array_equal(named[key], unnamed[key])
+    np.testing.assert_allclose(
+        named["cov.matrix"],
+        np.asarray(exp["pm_matrix_cov_pop_adj_true"]),
+        atol=TOL,
+    )
